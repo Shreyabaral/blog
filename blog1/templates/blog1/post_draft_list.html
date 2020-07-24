@@ -1,0 +1,10 @@
+{% extends 'blog1/index.html' %}
+{% block content %}
+{% for p in posts%}
+<div class="post">
+    <p class="date"> Created: {{p.created_date|date:'d-m-Y'}}</p>
+    <h1> <a href="{% url 'post_detail' pk= p.pk%}"></a></h1>
+    <p> {{p.text|truncatechars:200}}</p>
+</div>
+{% endfor%}
+{%endblock%}
