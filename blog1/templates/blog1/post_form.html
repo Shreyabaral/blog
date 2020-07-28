@@ -1,12 +1,21 @@
 {% extends 'blog1/index.html' %}
 {% block content %}
-<h1> New Post</h1>
+<h1> New Post </h1>
+{% if user.is_authenticated%}
+
 <form class="post-form" method="post">
     {%csrf_token%}
     {{form.as_p}}
 
     <button type="submit" class="save btn btn-default" name="button"> Save </button>
+
 </form>
- <script> var editor= new MediumEditor('.editable');</script>
+ <script> var editor= new MediumEditor('.editable');
+ var name = "{{user.id}}";
+ document.getElementById("aud").value=name;
+</script>
+{%else %}
+<p> you know you are not allowed here!</p>
+{% endif%}
 
 {% endblock%}
