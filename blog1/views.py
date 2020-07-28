@@ -1,21 +1,22 @@
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.template.loader import get_template, render_to_string
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.generic.base import View
 
 
-from .models import post, Comments
+from .models import post, Comments, Profile
 # Create your views here.
-from .forms import postForm, commentForm, SignUpForm
+from .forms import postForm, commentForm, SignUpForm, CustomUserChangeForm
 
 from django.views.generic import TemplateView,ListView,DetailView,CreateView,UpdateView,DeleteView
 
@@ -33,16 +34,25 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = post
 
-    def has_permission(self):
-        user = self.request.user
-        return user.has_perm('post_edit') or user.has_perm('post_detail')
+
+class ProfileUpdate(LoginRequiredMixin,UpdateView):
+   form_class = CustomUserChangeForm
+
+   template_name = 'accounts/profile.html'
+   success_url = reverse_lazy('about')
+
+   def get_object(self):
+       return self.request.user
 
 class PostCreateView(LoginRequiredMixin,CreateView):
     login_url = '/login/'
-
     form_class = postForm
     model = post
     success_url = reverse_lazy('post_list')
+
+    def get_object(self):
+        return self.request.user
+
 
 class PostUpdateView(LoginRequiredMixin,UpdateView,):
     login_url = '/login/'
@@ -75,18 +85,40 @@ class SignUpView(View):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False  # Deactivate account till it is confirmed
+            user.save()
+            name=user.username
 
-        user = form.save()
-        user.save()
-        html_file = get_template('registration/mail_template.html')
-        html_content = html_file.render()
-        msg = EmailMultiAlternatives(subject='test', from_email='shrbaral@gmail.com', to=['iamshrota@gmail.com'])
-        msg.attach_alternative(html_content, 'text/html')
-        msg.send()
-        return render(request, 'blog1/index.html')
+            sub = f" hi! {name} Thank you for signing up!!"
+            from_email = 'shrbaral@gmail.com'
+            to = ['iamshrota@gmail.com']
+            msg = sub
+            send_mail(subject="Confirmation Mail", message=msg, from_email=from_email, recipient_list=to)
+            return redirect('login')
+        return render(request, self.template_name, {'form': form})
 
 
+class ActivateAccount(View):
 
+    def get(self, request, uidb64, token, *args, **kwargs):
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and account_activation_token.check_token(user, token):
+            user.is_active = True
+            user.profile.email_confirmed = True
+            user.save()
+            login(request, user)
+            messages.success(request, ('Your account have been confirmed.'))
+            return redirect('home')
+        else:
+            messages.warning(request, ('The confirmation link was invalid, possibly because it has already been used.'))
+            return redirect('home')
 ###################################
 #@login_required
 #def home(request): { using mail trap}

@@ -10,6 +10,7 @@ urlpatterns= [
     path('contact/',views.contact,name='contact'),
     path('',views.aboutView.as_view(template_name="blog1/about.html"), name='about'),
     path('<slug:pk>/Detail/', views.PostDetailView.as_view(), name='post_detail'),
+    path('ProfileDetail/', views.ProfileUpdate.as_view(), name='profile_detail'),
     path('<slug:pk>/Update/', views.PostUpdateView.as_view(), name='post_edit'),
     path('<slug:pk>/Delete/', views.PostDeleteView.as_view(), name='post_remove'),
     path('List/', views.PostListView.as_view(), name='post_list'),
@@ -24,4 +25,5 @@ urlpatterns= [
     path('login/',LoginView.as_view(template_name='registration/login.html'),name='login'),
     path('logout/',LogoutView.as_view(template_name='registration/login.html'),name='logout'),
     path('signup/', views.SignUpView.as_view(), name='signup'),
+    path('activate/<uidb64>/<token>/', views.ActivateAccount.as_view(), name='activate'),
  ]

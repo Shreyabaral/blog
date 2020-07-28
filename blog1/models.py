@@ -11,16 +11,7 @@ from django.db import models
 
 
 
-# Create your models here.
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    email_confirmed = models.BooleanField(default=False)
 
-    @receiver(post_save, sender=User)
-    def update_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user=instance)
-            instance.profile.save()
 
 class post(models.Model):
     author= models.ForeignKey(User, on_delete=models.CASCADE)
@@ -53,4 +44,5 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.text
+
 

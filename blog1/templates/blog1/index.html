@@ -37,29 +37,29 @@
     <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
   </li>
 </ul>
- <ul class="nav nav-link active navbar-left">
+ <ul class="navbar navbar-default navbar-fixed-top affix-top">
      {% if user.is_authenticated%}
-     <li>
-         <a href="{% url 'post_create' %}"> new post</a>
-     </li>
-     <li>
+
+         <a href="{% url 'post_create' %}"> New Post</a>
+
+
+         <a href="{% url 'profile_detail' %}"> Edit Profile </a>
+
+
 
           <a href="{% url 'post_draft' %}"> Drafts</a>
-     </li>
-     <li>
+
 
           <a href="{% url 'logout'%}"> Log Out</a>
-     </li>
-     <li>
+
          <button class="noselect">Welcome: {{user.username}}</button>
      </li>
      {% else %}
-     <li>
-         <a  class=nav navbar-right href="{% url 'login' %}"> login </a>
-     </li>
-         <li>
-          <a  class=nav navbar-right href="{% url 'signup' %}"> Sign Up </a>
-     </li>
+
+         <a  class=nav navbar-right href="{% url 'login' %}"> LOGIN </a>
+
+          <a  class=nav navbar-right href="{% url 'signup' %}"> SIGN UP  </a>
+
      {% endif%}
  </ul>
 

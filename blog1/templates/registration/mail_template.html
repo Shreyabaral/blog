@@ -8,6 +8,13 @@
     <title>Document</title>
 </head>
 <body>
-<h1> Thank You fro Signing In !!</h1>
+{% autoescape off %}
+Hi {{ user.username }},
+<h1> Thank You for Signing In !!</h1>
+Please click on the link below to confirm your registration:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+{% endautoescape %}
+
 </body>
 </html>
